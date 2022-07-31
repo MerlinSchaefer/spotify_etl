@@ -12,7 +12,7 @@ Maybe (and that's a big maybe) this can even be enriched with a sensible recomme
 Stack (questionmark means potential but still undecided):
 
 - Python (pandas, spotipy)
-- SQL [SQLite or PostgreSQL](?)
+- PostgreSQL on RDS (?)
 - AWS Lambda (?)
 - AWS EC2 (?)
 - Airflow (?)
