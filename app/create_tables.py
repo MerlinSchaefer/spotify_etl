@@ -38,7 +38,7 @@ track_history_table = """
     played_at TIMESTAMP WITH TIME ZONE PRIMARY KEY,
     id VARCHAR(255) NOT NULL,
     name VARCHAR(255),
-    artists VARCHAR(255) ,
+    artists VARCHAR(255),
     album VARCHAR(255),
     duration_ms INTEGER,
     explicit BOOLEAN, 
