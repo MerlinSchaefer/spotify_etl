@@ -62,6 +62,6 @@ def clean_audio_features(audio_features: dict) -> pd.DataFrame:
     # drop duplicates as one track can be played multiple times
     df = df.drop_duplicates(subset="id")
     # drop unnecessary columns (mainly those already in the track dataframe)
-    df = df.drop(["duration_ms", "uri" "track_href", "type"], axis=1)
+    df = df.drop(["duration_ms", "uri", "track_href", "type"], axis=1)
 
     return df
