@@ -8,6 +8,7 @@ pandas = "*"
 spotipy = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
+pytest = "*"
 
 [dev-packages]
 
