@@ -3,42 +3,45 @@ import pandas as pd
 
 # import datavalidation
 
+## TODO create module structure for testing and validation function
+## TODO use fixtures in a modular way
+## TODO create unittests for validation functions
 
-@pytest.fixture
-def played_tracks_df_cols():
-    return [
-        "played_at",
-        "id",
-        "name",
-        "artists",
-        "album",
-        "duration_ms",
-        "explicit",
-        "href",
-        "is_local",
-        "popularity",
-        "uri",
-    ]
+# @pytest.fixture
+# def played_tracks_df_cols():
+#     return [
+#         "played_at",
+#         "id",
+#         "name",
+#         "artists",
+#         "album",
+#         "duration_ms",
+#         "explicit",
+#         "href",
+#         "is_local",
+#         "popularity",
+#         "uri",
+#     ]
 
 
-@pytest.fixture
-def audio_features_df_cols():
-    return [
-        "id",
-        "danceability",
-        "energy",
-        "key",
-        "loudness",
-        "mode",
-        "speechiness",
-        "acousticness",
-        "instrumentalness",
-        "liveness",
-        "valence",
-        "tempo",
-        "analysis_url",
-        "time_signature",
-    ]
+# @pytest.fixture
+# def audio_features_df_cols():
+#     return [
+#         "id",
+#         "danceability",
+#         "energy",
+#         "key",
+#         "loudness",
+#         "mode",
+#         "speechiness",
+#         "acousticness",
+#         "instrumentalness",
+#         "liveness",
+#         "valence",
+#         "tempo",
+#         "analysis_url",
+#         "time_signature",
+#     ]
 
 
 @pytest.fixture
