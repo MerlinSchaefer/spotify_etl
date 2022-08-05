@@ -88,6 +88,7 @@ class NullableError(Exception):
 
     pass
 
+
 class InvalidDataError(Exception):
     """
     Exception raised for violation of the invalid data constraint.
