@@ -54,10 +54,14 @@ def validate_audio_data(df: pd.DataFrame) -> bool:
         print("No tracks retrieved. Finishing execution")
         return False
 
-    # Primary Key Check
-    if not pd.Series(df["id"]).is_unique and not df["id"].isnull().values.any():
+    # Primary Key Uniqueness Check
+    if not pd.Series(df["id"]).is_unique:
         raise PrimaryKeyError("Primary Key check is violated")
 
+    # Primary Key Null Check
+    if df["id"].isnull().values.any():
+        raise NullableError("Null values found in primary key")
+        
     return True
 
 
