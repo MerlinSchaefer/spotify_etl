@@ -19,7 +19,7 @@ cursor = connection.cursor()
 track_history_query = """
 SELECT * 
 FROM track_history
-LIMIT 10;
+ORDER BY played_at;
 """
 
 track_history_count_query = """
