@@ -1,47 +1,10 @@
 import pytest
 import pandas as pd
+import numpy as np 
+from app.datavalidation import  validate_played_data, PrimaryKeyError, NullableError
 
-# import datavalidation
-
-## TODO create module structure for testing and validation function
-## TODO use fixtures in a modular way
-## TODO create unittests for validation functions
-
-# @pytest.fixture
-# def played_tracks_df_cols():
-#     return [
-#         "played_at",
-#         "id",
-#         "name",
-#         "artists",
-#         "album",
-#         "duration_ms",
-#         "explicit",
-#         "href",
-#         "is_local",
-#         "popularity",
-#         "uri",
-#     ]
-
-
-# @pytest.fixture
-# def audio_features_df_cols():
-#     return [
-#         "id",
-#         "danceability",
-#         "energy",
-#         "key",
-#         "loudness",
-#         "mode",
-#         "speechiness",
-#         "acousticness",
-#         "instrumentalness",
-#         "liveness",
-#         "valence",
-#         "tempo",
-#         "analysis_url",
-#         "time_signature",
-#     ]
+# This file contains unit tests for the data validation function for played 
+# tracks in the datavalidation.py file.
 
 
 @pytest.fixture
@@ -166,3 +129,23 @@ def played_tracks_df():
         ],
     ]
     return pd.DataFrame(values, columns=cols)
+
+def test_validate_correct_data(played_tracks_df):
+    # test that the valid dataframe is detected
+    assert validate_played_data(played_tracks_df) == True
+
+def test_validate_empty_df():
+    # test that an empty dataframe is detected
+    assert validate_played_data(pd.DataFrame()) == False
+
+def test_validate_nulls_in_nonnullable(played_tracks_df):
+    # test that a dataframe with nulls in a non-nullable column is detected
+    played_tracks_df.loc[0,"played_at"] = np.nan
+    with pytest.raises(NullableError):
+        validate_played_data(played_tracks_df)
+
+def test_validate_primary_key(played_tracks_df):
+    # test that a dataframe with a duplicate primary key is detected
+    played_tracks_df.loc[0,"played_at"] = played_tracks_df.loc[1,"played_at"]
+    with pytest.raises(PrimaryKeyError):
+        validate_played_data(played_tracks_df)
