@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
-import numpy as np
-from app.datavalidation import validate_played_data, PrimaryKeyError, NullableError
+import numpy as np 
+from app.datavalidation import  validate_played_data, PrimaryKeyError, NullableError, InvalidDataError
 
 # This file contains unit tests for the data validation function for played
 # tracks in the datavalidation.py file.
@@ -152,4 +152,40 @@ def test_validate_primary_key(played_tracks_df):
     # test that a dataframe with a duplicate primary key is detected
     played_tracks_df.loc[0, "played_at"] = played_tracks_df.loc[1, "played_at"]
     with pytest.raises(PrimaryKeyError):
+        validate_played_data(played_tracks_df)
+
+def test_validate_single_apostrophe_album(played_tracks_df):
+    # test that a dataframe with single apostrophe in album column is detected
+    played_tracks_df.loc[0,"album"] = "The 'Greatest Hits' of 'The Beatles'"
+    with pytest.raises(InvalidDataError):
+        validate_played_data(played_tracks_df)
+
+def test_validate_single_apostrophe_artists(played_tracks_df):
+    # test that a dataframe with single apostrophe in artists column is detected
+    played_tracks_df.loc[0,"artists"] = "'The' Beatles"
+    with pytest.raises(InvalidDataError):
+        validate_played_data(played_tracks_df)
+
+def test_validate_single_apostrophe_name(played_tracks_df):
+    # test that a dataframe with single apostrophe in name column is detected
+    played_tracks_df.loc[0,"name"] = "'Yellow' Submarine"
+    with pytest.raises(InvalidDataError):
+        validate_played_data(played_tracks_df)
+
+def test_validate_quotationmarks_album(played_tracks_df):
+    # test that a dataframe with single apostrophe in album column is detected
+    played_tracks_df.loc[0,"album"] = 'The "Greatest" Hits of The Beatles'
+    with pytest.raises(InvalidDataError):
+        validate_played_data(played_tracks_df)
+
+def test_validate_quotationmarks_artists(played_tracks_df):
+    # test that a dataframe with single apostrophe in artists column is detected
+    played_tracks_df.loc[0,"artists"] = '"The" Beatles'
+    with pytest.raises(InvalidDataError):
+        validate_played_data(played_tracks_df)
+
+def test_validate_quotationmarks_name(played_tracks_df):
+    # test that a dataframe with single apostrophe in name column is detected
+    played_tracks_df.loc[0,"name"] = '"Yellow" Submarine'
+    with pytest.raises(InvalidDataError):
         validate_played_data(played_tracks_df)

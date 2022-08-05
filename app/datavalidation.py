@@ -31,6 +31,14 @@ def validate_played_data(df: pd.DataFrame, not_null_cols: List[str] = None) -> b
     if df[not_null_cols].isnull().values.any():
         raise NullableError("Null values found in non-nullable columns")
 
+    # Check for no apostrophes or quotation marks in album, artists and name columns
+    if df["album"].str.contains("'").any() or df["album"].str.contains('"').any():
+        raise InvalidDataError("Apostrophes or quotation marks found in album column")
+    if df["artists"].str.contains("'").any() or df["artists"].str.contains('"').any():
+        raise InvalidDataError("Apostrophes or quotation marks foundin artist column")
+    if df["name"].str.contains("'").any() or df["name"].str.contains('"').any():
+        raise InvalidDataError("Apostrophes or quotation marks found in name column")
+
     return True
 
 
@@ -76,6 +84,13 @@ class PrimaryKeyError(Exception):
 class NullableError(Exception):
     """
     Exception raised for violation of the nullable constraint.
+    """
+
+    pass
+
+class InvalidDataError(Exception):
+    """
+    Exception raised for violation of the invalid data constraint.
     """
 
     pass
