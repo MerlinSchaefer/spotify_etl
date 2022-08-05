@@ -1,9 +1,9 @@
 import pytest
 import pandas as pd
-import numpy as np 
-from app.datavalidation import  validate_played_data, PrimaryKeyError, NullableError
+import numpy as np
+from app.datavalidation import validate_played_data, PrimaryKeyError, NullableError
 
-# This file contains unit tests for the data validation function for played 
+# This file contains unit tests for the data validation function for played
 # tracks in the datavalidation.py file.
 
 
@@ -130,22 +130,26 @@ def played_tracks_df():
     ]
     return pd.DataFrame(values, columns=cols)
 
+
 def test_validate_correct_data(played_tracks_df):
     # test that the valid dataframe is detected
     assert validate_played_data(played_tracks_df) == True
+
 
 def test_validate_empty_df():
     # test that an empty dataframe is detected
     assert validate_played_data(pd.DataFrame()) == False
 
+
 def test_validate_nulls_in_nonnullable(played_tracks_df):
     # test that a dataframe with nulls in a non-nullable column is detected
-    played_tracks_df.loc[0,"played_at"] = np.nan
+    played_tracks_df.loc[0, "played_at"] = np.nan
     with pytest.raises(NullableError):
         validate_played_data(played_tracks_df)
 
+
 def test_validate_primary_key(played_tracks_df):
     # test that a dataframe with a duplicate primary key is detected
-    played_tracks_df.loc[0,"played_at"] = played_tracks_df.loc[1,"played_at"]
+    played_tracks_df.loc[0, "played_at"] = played_tracks_df.loc[1, "played_at"]
     with pytest.raises(PrimaryKeyError):
         validate_played_data(played_tracks_df)

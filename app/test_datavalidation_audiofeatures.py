@@ -46,12 +46,12 @@ def test_validate_empty_df():
     assert validate_audio_data(pd.DataFrame()) == False
 
 
-
 def test_validate_primary_key_unique(audio_features_df):
     # test that a dataframe with a duplicate primary key is detected
     audio_features_df.loc[0, "id"] = audio_features_df.loc[1, "id"]
     with pytest.raises(PrimaryKeyError):
         validate_audio_data(audio_features_df)
+
 
 def test_validate_primary_key_null(audio_features_df):
     # test that a dataframe with a null primary key is detected
