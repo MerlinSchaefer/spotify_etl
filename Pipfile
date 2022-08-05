@@ -6,6 +6,10 @@ name = "pypi"
 [packages]
 pandas = "*"
 spotipy = "*"
+sqlalchemy = "*"
+psycopg2-binary = "*"
+pytest = "*"
+boto3 = "*"
 
 [dev-packages]
 
