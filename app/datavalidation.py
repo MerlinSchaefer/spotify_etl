@@ -35,20 +35,20 @@ def validate_played_data(df: pd.DataFrame, not_null_cols: List[str] = None) -> b
 
 
 def validate_audio_data(df: pd.DataFrame) -> bool:
-    """ 
+    """
     Validate the dataframe of audio features.
-    
+
     Parameters
     ----------
     df : pd.DataFrame
         The dataframe of audio features.
-    
+
     Returns
     -------
     bool
         True if the dataframe is valid, False otherwise.
     """
-    
+
     # Check if dataframe is empty
     if df.empty:
         print("No tracks retrieved. Finishing execution")
@@ -57,7 +57,7 @@ def validate_audio_data(df: pd.DataFrame) -> bool:
     # Primary Key Check
     if not pd.Series(df["id"]).is_unique and not df["id"].isnull().values.any():
         raise PrimaryKeyError("Primary Key check is violated")
-    
+
     return True
 
 
@@ -65,10 +65,13 @@ class PrimaryKeyError(Exception):
     """
     Exception raised for violation of the primary key constraint.
     """
+
     pass
+
 
 class NullableError(Exception):
     """
     Exception raised for violation of the nullable constraint.
     """
+
     pass

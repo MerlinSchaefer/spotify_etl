@@ -166,6 +166,3 @@ def played_tracks_df():
         ],
     ]
     return pd.DataFrame(values, columns=cols)
-
-
-

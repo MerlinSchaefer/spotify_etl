@@ -82,17 +82,16 @@ print(pd.read_sql(table_check_query, con=connection))
 # load initial data
 
 
-    
-with open('initial_data/raw_audio_features.csv', 'r') as row:
-    next(row) 
-    cursor.copy_from(row, 'audio_features', sep=';', null='')
-
-with open('initial_data/audio_feat_details.csv', 'r') as row:
+with open("initial_data/raw_audio_features.csv", "r") as row:
     next(row)
-    cursor.copy_from(row, 'audio_features_metadata', sep=';', null='')
+    cursor.copy_from(row, "audio_features", sep=";", null="")
 
-with open('initial_data/raw_current_tracks.csv', 'r') as row:
-    next(row)# Skip the header row.
-    cursor.copy_from(row, 'track_history', sep=';',null='')
-    
-connection.commit()  
+with open("initial_data/audio_feat_details.csv", "r") as row:
+    next(row)
+    cursor.copy_from(row, "audio_features_metadata", sep=";", null="")
+
+with open("initial_data/raw_current_tracks.csv", "r") as row:
+    next(row)  # Skip the header row.
+    cursor.copy_from(row, "track_history", sep=";", null="")
+
+connection.commit()

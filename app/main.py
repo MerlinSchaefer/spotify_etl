@@ -40,13 +40,25 @@ if __name__ == "__main__":
                 audio_features_df.to_csv("audio_features.csv", index=False, sep=";")
             else:
                 # connect to the database
-                connection = psycopg2.connect(f"dbname={DB_NAME} user={DB_USER} password={DB_PASSWORD} host={DB_HOST} port={PORT}")
+                connection = psycopg2.connect(
+                    f"dbname={DB_NAME} user={DB_USER} password={DB_PASSWORD} host={DB_HOST} port={PORT}"
+                )
                 # create a cursor object
                 cursor = connection.cursor()
                 # insert the recently played tracks dataframe into the database
-                played_tracks_df.to_sql(name="played_tracks", con=connection, if_exists="append", index=False)
+                played_tracks_df.to_sql(
+                    name="played_tracks",
+                    con=connection,
+                    if_exists="append",
+                    index=False,
+                )
                 # insert the audio features dataframe into the database
-                audio_features_df.to_sql(name="audio_features", con=connection, if_exists="append", index=False)
+                audio_features_df.to_sql(
+                    name="audio_features",
+                    con=connection,
+                    if_exists="append",
+                    index=False,
+                )
                 # commit the changes to the database
                 connection.commit()
                 # close the connection
@@ -55,4 +67,3 @@ if __name__ == "__main__":
             print("Audio features dataframe is not valid.")
     else:
         print("Recently played tracks dataframe is not valid.")
-        

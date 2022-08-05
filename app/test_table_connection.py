@@ -15,7 +15,6 @@ connection = psycopg2.connect(
 cursor = connection.cursor()
 
 
-
 track_history_query = """
 SELECT * 
 FROM track_history
@@ -50,4 +49,3 @@ print(pd.read_sql(audio_features_query, con=connection))
 print(pd.read_sql(audio_features_count_query, con=connection))
 print("Testing audio_features_metadata_query")
 print(pd.read_sql(audio_features_metadata_query, con=connection))
-
