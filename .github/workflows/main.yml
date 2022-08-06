@@ -18,17 +18,17 @@ jobs:
     runs-on: ubuntu-latest
     name: Checks
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 
-    - uses: actions/setup-python@v4
+    - uses: actions/checkout@v2
+    # Set up Python 
+    - uses: actions/setup-python@v2
       with:
         python-version: 3.x
-    - name: Install packages
+    # Install packages
     - run: pip install --upgrade pip
     - run: pip install mypy pytest 
-    - name: Type checking with mypy
+    # Type checking with mypy
     - run: mypy --strict $(git ls-files '*.py') --ignore-missing-imports
-    - name: Test with pytest
+    # Test with pytest
     - run: pytest app/.
 
 
