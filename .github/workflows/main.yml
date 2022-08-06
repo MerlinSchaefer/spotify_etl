@@ -25,7 +25,7 @@ jobs:
         python-version: 3.x
     # Install packages
     - run: pip install --upgrade pip
-    - run: pip install mypy==0.971 pipenv
+    - run: pip install mypy==0.971 pipenv pytest
     # Type checking with mypy
     - run: mypy --strict $(git ls-files '*.py') --ignore-missing-imports
     # Test with pytest
