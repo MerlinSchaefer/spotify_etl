@@ -8,7 +8,7 @@ from app.datavalidation import validate_audio_data, PrimaryKeyError, NullableErr
 
 
 @pytest.fixture
-def audio_features_df():
+def audio_features_df() -> pd.DataFrame:
     df_dict = {
         "danceability": {0: 0.774, 1: 0.736, 2: 0.911},
         "energy": {0: 0.558, 1: 0.681, 2: 0.712},
@@ -36,24 +36,24 @@ def audio_features_df():
     return pd.DataFrame(df_dict)
 
 
-def test_validate_correct_data(audio_features_df):
+def test_validate_correct_data(audio_features_df: pd.DataFrame) -> None:
     # test that the valid dataframe is detected
     assert validate_audio_data(audio_features_df) == True
 
 
-def test_validate_empty_df():
+def test_validate_empty_df()-> None:
     # test that an empty dataframe is detected
     assert validate_audio_data(pd.DataFrame()) == False
 
 
-def test_validate_primary_key_unique(audio_features_df):
+def test_validate_primary_key_unique(audio_features_df:pd.DataFrame)-> None:
     # test that a dataframe with a duplicate primary key is detected
     audio_features_df.loc[0, "id"] = audio_features_df.loc[1, "id"]
     with pytest.raises(PrimaryKeyError):
         validate_audio_data(audio_features_df)
 
 
-def test_validate_primary_key_null(audio_features_df):
+def test_validate_primary_key_null(audio_features_df:pd.DataFrame)-> None:
     # test that a dataframe with a null primary key is detected
     audio_features_df.loc[0, "id"] = np.nan
     with pytest.raises(NullableError):
