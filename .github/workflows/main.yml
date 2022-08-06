@@ -25,11 +25,13 @@ jobs:
         python-version: 3.x
     # Install packages
     - run: pip install --upgrade pip
-    - run: pip install mypy pytest 
+    - run: pip install mypy pipenv
     # Type checking with mypy
     - run: mypy --strict $(git ls-files '*.py') --ignore-missing-imports
     # Test with pytest
-    - run: pytest app/.
+    - run: |
+          pipenv install --dev
+          pipenv run pytest app/.
 
 
 
