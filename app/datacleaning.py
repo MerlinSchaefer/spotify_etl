@@ -1,7 +1,7 @@
 import pandas as pd
+from typing import Dict
 
-
-def clean_recently_played(recently_played: dict) -> pd.DataFrame:
+def clean_recently_played(recently_played: Dict[str,str]) -> pd.DataFrame:
     """
     Load the recently played json dict into a pd.DataFrame
     and clean it to only contain necessary columns.
@@ -43,7 +43,7 @@ def clean_recently_played(recently_played: dict) -> pd.DataFrame:
     return df
 
 
-def clean_audio_features(audio_features: dict) -> pd.DataFrame:
+def clean_audio_features(audio_features: Dict[str,str]) -> pd.DataFrame:
     """
     Load the audio features json dict into a pd.DataFrame
     and clean the audio features dataframe.
