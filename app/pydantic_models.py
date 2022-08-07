@@ -1,10 +1,10 @@
 import pandas as pd
-from pydantic import BaseModel, Field, conint, confloat, constr
+from pydantic import BaseModel, Field
 from pydantic.main import ModelMetaclass
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Any, TypeVar
 
 
-def validate_data_schema(data_schema: ModelMetaclass) -> Callable:
+def validate_data_schema(data_schema: ModelMetaclass) -> Callable[..., Any]:
     """Validate a pd.DataFrame against the given data_schema. (decorator)
 
     Parameters
@@ -14,8 +14,8 @@ def validate_data_schema(data_schema: ModelMetaclass) -> Callable:
 
     """
 
-    def Inner(func):
-        def wrapper(*args, **kwargs):
+    def Inner(func: Callable[..., Any]) -> Callable[..., Any]:
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             res = func(*args, **kwargs)
             if isinstance(res, pd.DataFrame):
                 # check result of the function execution against the data_schema
@@ -23,7 +23,8 @@ def validate_data_schema(data_schema: ModelMetaclass) -> Callable:
 
                 # Wrap the data_schema into a helper class for validation
                 class ValidationWrap(BaseModel):
-                    df_dict: List[data_schema]
+                    df_dict: List[data_schema]  # type: ignore
+                    # (ignoring the type of the data_schema as the way mypy and  pydantic work is not compatible here)
 
                 # Do the validation
                 _ = ValidationWrap(df_dict=df_dict)
@@ -42,30 +43,30 @@ def validate_data_schema(data_schema: ModelMetaclass) -> Callable:
 
 class TracksDataSchema(BaseModel):
     played_at: pd.datetime64
-    id: constr = Field(max_length=255)
-    name: constr = Field(max_length=255)
-    artists: constr = Field(max_length=255)
-    album: constr = Field(max_length=255)
-    duration_ms: conint
+    id: str = Field(max_length=255)
+    name: str = Field(max_length=255)
+    artists: str = Field(max_length=255)
+    album: str = Field(max_length=255)
+    duration_ms: int
     explicit: bool
-    href: constr = Field(max_length=500)
+    href: str = Field(max_length=500)
     is_local: bool
-    popularity: conint = Field(ge=0, le=100)
-    uri: constr = Field(max_length=255)
+    popularity: int = Field(ge=0, le=100)
+    uri: str = Field(max_length=255)
 
 
 class AudioFeaturesDataSchema(BaseModel):
-    id: constr = Field(max_length=255)
-    danceability: confloat = Field(ge=0, le=1)
-    energy: confloat = Field(ge=0, le=1)
-    key: conint = Field(ge=-1, le=11)
-    loudness: confloat
-    mode: conint = Field(ge=0, le=1)
-    speechiness: confloat = Field(ge=0, le=1)
-    acousticness: confloat = Field(ge=0, le=1)
-    instrumentalness: confloat = Field(ge=0, le=1)
-    liveness: confloat
-    valence: confloat = Field(ge=0, le=1)
-    tempo: confloat = Field(ge=0)
-    analysis_url: constr = Field(max_length=500)
-    time_signature: conint = Field(ge=3, le=7)
+    id: str = Field(max_length=255)
+    danceability: float = Field(ge=0, le=1)
+    energy: float = Field(ge=0, le=1)
+    key: int = Field(ge=-1, le=11)
+    loudness: float
+    mode: int = Field(ge=0, le=1)
+    speechiness: float = Field(ge=0, le=1)
+    acousticness: float = Field(ge=0, le=1)
+    instrumentalness: float = Field(ge=0, le=1)
+    liveness: float
+    valence: float = Field(ge=0, le=1)
+    tempo: float = Field(ge=0)
+    analysis_url: str = Field(max_length=500)
+    time_signature: int = Field(ge=3, le=7)
