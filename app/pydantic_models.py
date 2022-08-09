@@ -42,7 +42,7 @@ def validate_data_schema(data_schema: ModelMetaclass) -> Callable[..., Any]:
 
 
 class TracksDataSchema(BaseModel):
-    played_at: pd.datetime64
+    played_at: str
     id: str = Field(max_length=255)
     name: str = Field(max_length=255)
     artists: str = Field(max_length=255)
@@ -69,4 +69,4 @@ class AudioFeaturesDataSchema(BaseModel):
     valence: float = Field(ge=0, le=1)
     tempo: float = Field(ge=0)
     analysis_url: str = Field(max_length=500)
-    time_signature: int = Field(ge=3, le=7)
+    time_signature: int  # = Field(ge=3, le=7)

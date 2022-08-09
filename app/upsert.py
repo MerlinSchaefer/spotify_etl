@@ -1,9 +1,13 @@
 import pandas as pd
 import psycopg2
+from typing import Any
+
+# create type as mypy struggles with psycopg2 Connection
+DBConnection = Any
 
 
 def upsert_df(
-    df: pd.DataFrame, table_name: str, primary_key: str, connection: psycopg2.Connection
+    df: pd.DataFrame, table_name: str, primary_key: str, connection: DBConnection
 ) -> bool:
     """Implements the equivalent of pd.DataFrame.to_sql(..., if_exists='update')
     (which does not exist). Creates or updates the db records based on the
@@ -56,7 +60,7 @@ def upsert_df(
     return True
 
 
-def check_table_exists(table_name: str, connection: psycopg2.Connection) -> bool:
+def check_table_exists(table_name: str, connection: DBConnection) -> Any:
     """Checks if a table exists in the database.
     Parameters
     ----------

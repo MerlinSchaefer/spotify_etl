@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 from typing import Dict
 from pydantic_models import (
@@ -7,7 +8,7 @@ from pydantic_models import (
 )
 
 
-@validate_data_schema(data_schema=TracksDataSchema)
+@validate_data_schema(data_schema=TracksDataSchema)  # type: ignore
 def clean_recently_played(recently_played: Dict[str, str]) -> pd.DataFrame:
     """
     Load the recently played json dict into a pd.DataFrame
@@ -33,7 +34,6 @@ def clean_recently_played(recently_played: Dict[str, str]) -> pd.DataFrame:
     )
     df["artists"] = df["artists"].apply(lambda x: x[0].get("name"))
     df["album"] = df["album"].apply(lambda x: x.get("name"))
-    df["played_at"] = pd.to_datetime(df["played_at"])
     # drop unnecessary columns
     df = df.drop(
         [
@@ -47,10 +47,16 @@ def clean_recently_played(recently_played: Dict[str, str]) -> pd.DataFrame:
         ],
         axis=1,
     )
+    # remove apostrophes and quotation marks from the artists column
+    df["artists"] = df["artists"].str.replace(r"[\"\',]", "", regex=True)
+    # remove apostrophes and quotation marks from the album column
+    df["album"] = df["album"].str.replace(r"[\"\',]", "", regex=True)
+    # remove apostrophes and quotation marks from the name column
+    df["name"] = df["name"].str.replace(r"[\"\',]", "", regex=True)
     return df
 
 
-@validate_data_schema(data_schema=AudioFeaturesDataSchema)
+@validate_data_schema(data_schema=AudioFeaturesDataSchema)  # type: ignore
 def clean_audio_features(audio_features: Dict[str, str]) -> pd.DataFrame:
     """
     Load the audio features json dict into a pd.DataFrame
