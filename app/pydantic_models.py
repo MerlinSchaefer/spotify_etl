@@ -1,7 +1,7 @@
 import pandas as pd
 from pydantic import BaseModel, Field
 from pydantic.main import ModelMetaclass
-from typing import Callable, List, Optional, Any, TypeVar
+from typing import Callable, List, Any
 
 
 def validate_data_schema(data_schema: ModelMetaclass) -> Callable[..., Any]:
@@ -24,7 +24,7 @@ def validate_data_schema(data_schema: ModelMetaclass) -> Callable[..., Any]:
                 # Wrap the data_schema into a helper class for validation
                 class ValidationWrap(BaseModel):
                     df_dict: List[data_schema]  # type: ignore
-                    # (ignoring the type of the data_schema as the way mypy and  pydantic work is not compatible here)
+                    # (ignoring the type of the data_schema as the way mypy and pydantic work is not compatible here)
 
                 # Do the validation
                 _ = ValidationWrap(df_dict=df_dict)
