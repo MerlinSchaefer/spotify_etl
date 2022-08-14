@@ -25,7 +25,7 @@ jobs:
         python-version: 3.9
     # Install packages
     - run: pip install --upgrade pip
-    - run: pip install mypy==0.971 pipenv pytest
+    - run: pip install mypy==0.971 pipenv pytest pydantic
     # Type checking with mypy
     - run: mypy --strict $(git ls-files '*.py') --ignore-missing-imports
     # Test with pytest
