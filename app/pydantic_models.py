@@ -22,7 +22,7 @@ def validate_data_schema(data_schema: ModelMetaclass) -> Callable[..., Any]:
                 df_dict = res.to_dict(orient="records")
 
                 # Wrap the data_schema into a helper class for validation
-                class ValidationWrap(BaseModel):
+                class ValidationWrap(BaseModel):  # type: ignore
                     df_dict: List[data_schema]  # type: ignore
                     # (ignoring the type of the data_schema as the way mypy and pydantic work is not compatible here)
 
@@ -41,7 +41,7 @@ def validate_data_schema(data_schema: ModelMetaclass) -> Callable[..., Any]:
     return Inner
 
 
-class TracksDataSchema(BaseModel):
+class TracksDataSchema(BaseModel):  # type: ignore
     played_at: str
     id: str = Field(max_length=255)
     name: str = Field(max_length=255)
@@ -55,7 +55,7 @@ class TracksDataSchema(BaseModel):
     uri: str = Field(max_length=255)
 
 
-class AudioFeaturesDataSchema(BaseModel):
+class AudioFeaturesDataSchema(BaseModel):  # type: ignore
     id: str = Field(max_length=255)
     danceability: float = Field(ge=0, le=1)
     energy: float = Field(ge=0, le=1)
