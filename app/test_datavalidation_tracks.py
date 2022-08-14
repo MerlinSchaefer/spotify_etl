@@ -13,7 +13,7 @@ from app.datavalidation import (
 
 
 @pytest.fixture
-def played_tracks_df()->pd.DataFrame:
+def played_tracks_df() -> pd.DataFrame:
     cols = [
         "album",
         "artists",
@@ -136,66 +136,66 @@ def played_tracks_df()->pd.DataFrame:
     return pd.DataFrame(values, columns=cols)
 
 
-def test_validate_correct_data(played_tracks_df:pd.DataFrame)-> None:
+def test_validate_correct_data(played_tracks_df: pd.DataFrame) -> None:
     # test that the valid dataframe is detected
     assert validate_played_data(played_tracks_df) == True
 
 
-def test_validate_empty_df()-> None:
+def test_validate_empty_df() -> None:
     # test that an empty dataframe is detected
     assert validate_played_data(pd.DataFrame()) == False
 
 
-def test_validate_nulls_in_nonnullable(played_tracks_df:pd.DataFrame)-> None:
+def test_validate_nulls_in_nonnullable(played_tracks_df: pd.DataFrame) -> None:
     # test that a dataframe with nulls in a non-nullable column is detected
     played_tracks_df.loc[0, "played_at"] = np.nan
     with pytest.raises(NullableError):
         validate_played_data(played_tracks_df)
 
 
-def test_validate_primary_key(played_tracks_df:pd.DataFrame)-> None:
+def test_validate_primary_key(played_tracks_df: pd.DataFrame) -> None:
     # test that a dataframe with a duplicate primary key is detected
     played_tracks_df.loc[0, "played_at"] = played_tracks_df.loc[1, "played_at"]
     with pytest.raises(PrimaryKeyError):
         validate_played_data(played_tracks_df)
 
 
-def test_validate_single_apostrophe_album(played_tracks_df:pd.DataFrame)-> None:
+def test_validate_single_apostrophe_album(played_tracks_df: pd.DataFrame) -> None:
     # test that a dataframe with single apostrophe in album column is detected
     played_tracks_df.loc[0, "album"] = "The 'Greatest Hits' of 'The Beatles'"
     with pytest.raises(InvalidDataError):
         validate_played_data(played_tracks_df)
 
 
-def test_validate_single_apostrophe_artists(played_tracks_df:pd.DataFrame)-> None:
+def test_validate_single_apostrophe_artists(played_tracks_df: pd.DataFrame) -> None:
     # test that a dataframe with single apostrophe in artists column is detected
     played_tracks_df.loc[0, "artists"] = "'The' Beatles"
     with pytest.raises(InvalidDataError):
         validate_played_data(played_tracks_df)
 
 
-def test_validate_single_apostrophe_name(played_tracks_df:pd.DataFrame)-> None:
+def test_validate_single_apostrophe_name(played_tracks_df: pd.DataFrame) -> None:
     # test that a dataframe with single apostrophe in name column is detected
     played_tracks_df.loc[0, "name"] = "'Yellow' Submarine"
     with pytest.raises(InvalidDataError):
         validate_played_data(played_tracks_df)
 
 
-def test_validate_quotationmarks_album(played_tracks_df:pd.DataFrame)-> None:
+def test_validate_quotationmarks_album(played_tracks_df: pd.DataFrame) -> None:
     # test that a dataframe with single apostrophe in album column is detected
     played_tracks_df.loc[0, "album"] = 'The "Greatest" Hits of The Beatles'
     with pytest.raises(InvalidDataError):
         validate_played_data(played_tracks_df)
 
 
-def test_validate_quotationmarks_artists(played_tracks_df:pd.DataFrame)-> None:
+def test_validate_quotationmarks_artists(played_tracks_df: pd.DataFrame) -> None:
     # test that a dataframe with single apostrophe in artists column is detected
     played_tracks_df.loc[0, "artists"] = '"The" Beatles'
     with pytest.raises(InvalidDataError):
         validate_played_data(played_tracks_df)
 
 
-def test_validate_quotationmarks_name(played_tracks_df:pd.DataFrame)-> None:
+def test_validate_quotationmarks_name(played_tracks_df: pd.DataFrame) -> None:
     # test that a dataframe with single apostrophe in name column is detected
     played_tracks_df.loc[0, "name"] = '"Yellow" Submarine'
     with pytest.raises(InvalidDataError):

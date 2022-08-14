@@ -5,7 +5,9 @@ import os
 import boto3
 
 
-def upsert_df(df: pd.DataFrame, table_name: str, primary_key: str, connection:psycopg2.Connection) -> bool:
+def upsert_df(
+    df: pd.DataFrame, table_name: str, primary_key: str, connection: psycopg2.Connection
+) -> bool:
     """Implements the equivalent of pd.DataFrame.to_sql(..., if_exists='update')
     (which does not exist). Creates or updates the db records based on the
     dataframe records.

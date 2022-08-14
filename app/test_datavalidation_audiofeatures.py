@@ -41,19 +41,19 @@ def test_validate_correct_data(audio_features_df: pd.DataFrame) -> None:
     assert validate_audio_data(audio_features_df) == True
 
 
-def test_validate_empty_df()-> None:
+def test_validate_empty_df() -> None:
     # test that an empty dataframe is detected
     assert validate_audio_data(pd.DataFrame()) == False
 
 
-def test_validate_primary_key_unique(audio_features_df:pd.DataFrame)-> None:
+def test_validate_primary_key_unique(audio_features_df: pd.DataFrame) -> None:
     # test that a dataframe with a duplicate primary key is detected
     audio_features_df.loc[0, "id"] = audio_features_df.loc[1, "id"]
     with pytest.raises(PrimaryKeyError):
         validate_audio_data(audio_features_df)
 
 
-def test_validate_primary_key_null(audio_features_df:pd.DataFrame)-> None:
+def test_validate_primary_key_null(audio_features_df: pd.DataFrame) -> None:
     # test that a dataframe with a null primary key is detected
     audio_features_df.loc[0, "id"] = np.nan
     with pytest.raises(NullableError):

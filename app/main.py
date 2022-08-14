@@ -1,9 +1,12 @@
-import pandas as pd
 import os
 import psycopg2
+import os
+import boto3
 from authentication import authenticate
 from datacleaning import clean_recently_played, clean_audio_features
 from datavalidation import validate_played_data, validate_audio_data
+from upsert import upsert_df
+from pydantic import ValidationError
 
 # Spotify API authentication settings
 CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
@@ -16,8 +19,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST")
 DB_NAME = os.getenv("DB_NAME")
 PORT = "5432"
-
-DEBUG = True
+REGION = "eu-central-1"
 
 if __name__ == "__main__":
 
@@ -26,43 +28,51 @@ if __name__ == "__main__":
     # retrieve recently played tracks
     played_tracks = spotify.current_user_recently_played(limit=50)
     # clean the recently played tracks and create dataframe
-    played_tracks_df = clean_recently_played(played_tracks)
-    # validate the recently played tracks dataframe
+    # checking dataframe structure with pydantic
+    try:
+        played_tracks_df = clean_recently_played(played_tracks)
+    except ValidationError as e:
+        print(e)
+    # validate the recently played tracks dataframe for sql requirements
+    print(played_tracks_df.head())
     if validate_played_data(played_tracks_df):
         # fetch audio features for the recently played tracks
         audio_features = spotify.audio_features(played_tracks_df["id"].tolist())
         # clean the audio features and create dataframe
-        audio_features_df = clean_audio_features(audio_features)
+        # checking dataframe structure with pydantic
+        try:
+            audio_features_df = clean_audio_features(audio_features)
+        except ValidationError as e:
+            print(e)
+        print(audio_features_df.head())
         # validate the audio features dataframe
         if validate_audio_data(audio_features_df):
-            if DEBUG:
-                played_tracks_df.to_csv("played_tracks.csv", index=False, sep=";")
-                audio_features_df.to_csv("audio_features.csv", index=False, sep=";")
-            else:
-                # connect to the database
+
+            # Authenticate with AWS and esstablish connection to database
+            boto3_session = boto3.Session(profile_name="default")
+            boto3_client = boto3_session.client("rds")
+            token = boto3_client.generate_db_auth_token(
+                DBHostname=DB_HOST, Port=PORT, DBUsername=DB_USER, Region=REGION
+            )
+            try:
                 connection = psycopg2.connect(
                     f"dbname={DB_NAME} user={DB_USER} password={DB_PASSWORD} host={DB_HOST} port={PORT}"
                 )
-                # create a cursor object
                 cursor = connection.cursor()
-                # insert the recently played tracks dataframe into the database
-                played_tracks_df.to_sql(
-                    name="played_tracks",
-                    con=connection,
-                    if_exists="append",
-                    index=False,
-                )
-                # insert the audio features dataframe into the database
-                audio_features_df.to_sql(
-                    name="audio_features",
-                    con=connection,
-                    if_exists="append",
-                    index=False,
-                )
-                # commit the changes to the database
+                query_results = cursor.execute("""SELECT now()""")
+                query_results = cursor.fetchall()
+                print(query_results)
+                print("Database connection established.")
+            except Exception as e:
+                print(f"Database connection failed due to {e}")
+            if upsert_df(
+                audio_features_df, "audio_features", "id", connection
+            ) and upsert_df(played_tracks_df, "track_history", "played_at", connection):
+                print("Success")
                 connection.commit()
-                # close the connection
-                connection.close()
+            else:
+                print("Failed")
+            connection.close()
         else:
             print("Audio features dataframe is not valid.")
     else:

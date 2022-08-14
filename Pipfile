@@ -11,6 +11,7 @@ psycopg2-binary = "*"
 pytest = "*"
 boto3 = "*"
 pre-commit = "*"
+pydantic = "*"
 
 [dev-packages]
 
