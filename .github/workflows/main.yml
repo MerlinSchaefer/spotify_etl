@@ -25,13 +25,11 @@ jobs:
         python-version: 3.9
     # Install packages
     - run: pip install --upgrade pip
-    - run: pip install mypy==0.971 pipenv pytest
+    - run: pip install mypy==0.971 pandas pytest
     # Type checking with mypy
     - run: mypy --strict $(git ls-files '*.py') --ignore-missing-imports --allow-subclassing-any
     # Test with pytest
-    - run: |
-          pipenv install 
-          pipenv run pytest app/.
+    - run: pytest app/.
 
 
 
