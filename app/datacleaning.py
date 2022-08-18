@@ -1,7 +1,7 @@
 import re
 import pandas as pd
 from typing import Dict
-from pydantic_models import (
+from app.pydantic_models import (
     validate_data_schema,
     TracksDataSchema,
     AudioFeaturesDataSchema,
