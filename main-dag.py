@@ -1,12 +1,17 @@
 import datetime
-
+import configparser
 from airflow.models import DAG
 from airflow.operators.python import PythonOperator
+from app.etl_funcs import spotify_etl
 
-WORKFLOW_DAG_ID = "spotify_workflow"
-WORKFLOW_START_DATE = datetime.datetime(2022, 8, 15)
+config = configparser.ConfigParser()
+config.read("dag_config.ini")
+
+
+WORKFLOW_DAG_ID = config["main_dag"].get("dag_id")
+WORKFLOW_START_DATE = datetime.datetime(2022, 8, 18)
 WORKFLOW_SCHEDULE_INTERVAL = datetime.timedelta(hours=1)
-WORKFLOW_EMAIL = ["maschaefer713@gmail.com"]  # TODO put into config file
+WORKFLOW_EMAIL = [config["main_dag"].get("workflow_email")]
 
 WORKFLOW_DEFAULT_ARGS = {
     "owner": "merlin.schaefer",
@@ -31,7 +36,7 @@ dag = DAG(
 
 job_spotify_etl_operator = PythonOperator(
     task_id="job_spotify_etl",
-    python_callable=spotify_etl,  # TODO: implement this function
+    python_callable=spotify_etl,
     dag=dag,
 )
 
