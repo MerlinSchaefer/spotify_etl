@@ -13,6 +13,7 @@ boto3 = "*"
 pre-commit = "*"
 pydantic = "*"
 apache-airflow = "*"
+ipykernel = "*"
 
 [dev-packages]
 
