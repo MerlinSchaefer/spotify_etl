@@ -11,7 +11,7 @@ from app.configuration import set_spotify_variables, set_postgres_variables
 from pydantic import ValidationError
 
 
-def spotify_etl():
+def spotify_etl() -> None:
     # Set the spotify and postgres variables
     CLIENT_ID, CLIENT_SECRET, SCOPE = set_spotify_variables()
     print("Spotify variables set")

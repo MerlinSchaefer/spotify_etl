@@ -1,7 +1,8 @@
 import configparser
+from typing import List
 
 
-def set_spotify_variables() -> list:
+def set_spotify_variables() -> List[str]:
     """
     Set the variables for the spotify authentication.
 
@@ -26,7 +27,7 @@ def set_spotify_variables() -> list:
     return [CLIENT_ID, CLIENT_SECRET, SCOPE]
 
 
-def set_postgres_variables() -> list:
+def set_postgres_variables() -> List[str]:
     """
     Set the variables for the postgres authentication.
 
