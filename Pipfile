@@ -12,6 +12,7 @@ pytest = "*"
 boto3 = "*"
 pre-commit = "*"
 pydantic = "*"
+apache-airflow = "*"
 
 [dev-packages]
 

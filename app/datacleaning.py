@@ -1,14 +1,14 @@
 import re
 import pandas as pd
 from typing import Dict
-from pydantic_models import (
+from app.pydantic_models import (
     validate_data_schema,
     TracksDataSchema,
     AudioFeaturesDataSchema,
 )
 
 
-@validate_data_schema(data_schema=TracksDataSchema)  # type: ignore
+@validate_data_schema(data_schema=TracksDataSchema)
 def clean_recently_played(recently_played: Dict[str, str]) -> pd.DataFrame:
     """
     Load the recently played json dict into a pd.DataFrame
@@ -56,7 +56,7 @@ def clean_recently_played(recently_played: Dict[str, str]) -> pd.DataFrame:
     return df
 
 
-@validate_data_schema(data_schema=AudioFeaturesDataSchema)  # type: ignore
+@validate_data_schema(data_schema=AudioFeaturesDataSchema)
 def clean_audio_features(audio_features: Dict[str, str]) -> pd.DataFrame:
     """
     Load the audio features json dict into a pd.DataFrame

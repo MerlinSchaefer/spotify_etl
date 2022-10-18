@@ -1,28 +1,22 @@
-import os
+import sys
+
+sys.path.append("../app")
 import psycopg2
-import os
 import boto3
-from authentication import authenticate
-from datacleaning import clean_recently_played, clean_audio_features
-from datavalidation import validate_played_data, validate_audio_data
-from upsert import upsert_df
+from app.authentication import authenticate
+from app.datacleaning import clean_recently_played, clean_audio_features
+from app.datavalidation import validate_played_data, validate_audio_data
+from app.upsert import upsert_df
+from app.configuration import set_spotify_variables, set_postgres_variables
 from pydantic import ValidationError
 
-# Spotify API authentication settings
-CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
-CLIENT_SECRET = os.getenv("SPOTIPY_CLIENT_SECRET")
-SCOPE = "user-read-recently-played user-read-currently-playing user-read-playback-state user-read-private"
 
-# DB settings
-DB_USER = os.getenv("DB_USERNAME")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_NAME = os.getenv("DB_NAME")
-PORT = "5432"
-REGION = "eu-central-1"
-
-if __name__ == "__main__":
-
+def spotify_etl() -> None:
+    # Set the spotify and postgres variables
+    CLIENT_ID, CLIENT_SECRET, SCOPE = set_spotify_variables()
+    print("Spotify variables set")
+    DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, PORT, REGION = set_postgres_variables()
+    print("Postgres variables set")
     # Authenticate with Spotify API
     spotify = authenticate(CLIENT_ID, CLIENT_SECRET, SCOPE)
     # retrieve recently played tracks
