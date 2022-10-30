@@ -34,7 +34,7 @@ if __name__ == "__main__":
         """
     last_month_tracks_df = pd.read_sql(last_month_track_history_query, con=connection)
     track_names = last_month_tracks_df["name"].value_counts()
-    recurring_tracks = track_names[(last_month_tracks_df["name"].value_counts() >= 2)]
+    recurring_tracks = track_names[(last_month_tracks_df["name"].value_counts() >= 3)]
     reccuring_tracks_df = last_month_tracks_df[
         last_month_tracks_df["name"].isin(recurring_tracks.index)
     ]
