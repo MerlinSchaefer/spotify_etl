@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS audio_features (
-    id STRING PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS spotify.audio_features (
+    id STRING,
     danceability DOUBLE, 
     energy DOUBLE, 
     key INT, 
