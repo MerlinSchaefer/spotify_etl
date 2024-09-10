@@ -16,6 +16,13 @@ Tech Stack (question mark means potential but still undecided):
 - PostgreSQL on RDS
 - AWS EC2 + cronjob (Airflow could technically be used, dag is functional, complications of setup on EC2 didn't warrant the effort. A simple cronjob works for the hourly data ingest.) 
 
+# V2.0 Databricks
+
+- after my free AWS tier ran out the project was stopped
+- decided to relaunch on Azure
+- starting with a setup on Databricks as this will be quickest and easiest for me
+- once I have it running may add a platform independent version again
+
 
 ## Spotify Authentication
 
