@@ -2,7 +2,7 @@ import configparser
 from typing import List
 
 
-def set_spotify_variables() -> List[str]:
+def set_spotify_variables(return_username: bool = False) -> List[str]:
     """
     Set the variables for the spotify authentication.
 
@@ -24,6 +24,9 @@ def set_spotify_variables() -> List[str]:
     CLIENT_ID = spotify_config.get("client_id")
     CLIENT_SECRET = spotify_config.get("client_secret")
     SCOPE = "user-read-recently-played user-read-currently-playing user-read-playback-state user-read-private"
+    if return_username:
+        USERNAME = spotify_config.get("username")
+        return [CLIENT_ID, CLIENT_SECRET, SCOPE, USERNAME]
     return [CLIENT_ID, CLIENT_SECRET, SCOPE]
 
 

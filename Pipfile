@@ -13,8 +13,10 @@ boto3 = "*"
 pre-commit = "*"
 pydantic = "*"
 apache-airflow = "*"
+ipykernel = "*"
 
 [dev-packages]
+ipykernel = "*"
 
 [requires]
 python_version = "3.9"
