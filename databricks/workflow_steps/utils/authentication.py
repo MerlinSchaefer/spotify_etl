@@ -69,9 +69,6 @@ def authenticate(
         open_browser=False
     )
     
-    # Force Spotipy to generate and print the URL manually
-    auth_url = auth_manager.get_authorize_url()
-    print(f"Please go to this URL to authorize access: {auth_url}")
-    
+   
     return spotipy.Spotify(auth_manager=auth_manager)
 

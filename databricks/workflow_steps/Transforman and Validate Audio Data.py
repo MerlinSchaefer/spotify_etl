@@ -1,21 +1,20 @@
 # Databricks notebook source
-from etl.data_cleaning import clean_recently_played
-from etl.data_validation import is_played_data_valid
+from etl.data_cleaning import clean_audio_features
+from etl.data_validation import is_audio_data_valid
 from pydantic import ValidationError
 from pyspark.sql.functions import col
 from pyspark.sql.types import IntegerType
 
-
 # COMMAND ----------
 
-STAGING_TABLE = "staging_track_history"
+STAGING_TABLE = "staging_audio_features"
 
 # COMMAND ----------
 
 # Fetch the latest record from raw_track_history
 latest_raw_json = spark.sql("""
     SELECT raw_data, ingestion_time 
-    FROM spotify.raw_track_history 
+    FROM spotify.raw_audio_features
     ORDER BY ingestion_time DESC 
     LIMIT 1
 """).collect()[0]['raw_data']
@@ -24,22 +23,19 @@ latest_raw_json = spark.sql("""
 
 try:
     # try to clean and transform data into valid pydantic model
-    transformed_df  = clean_recently_played(latest_raw_json)
+    transformed_df  = clean_audio_features(latest_raw_json)
 except ValidationError as e:
         print(e)
 
 
-
 # COMMAND ----------
 
-# validate the recently played tracks dataframe for table requirements
-if is_played_data_valid(transformed_df):
+if is_audio_data_valid(transformed_df):
     transformed_df = (spark.createDataFrame(transformed_df)
-                      .withColumn("played_at", col("played_at").cast("timestamp"))
-                      .withColumn("duration_ms", col("duration_ms").cast(IntegerType()))
-                      .withColumn("popularity", col("popularity").cast(IntegerType()))
+                           .withColumn("key", col("key").cast(IntegerType()))
+                           .withColumn("mode", col("mode").cast(IntegerType()))
+                           .withColumn("time_signature", col("time_signature").cast(IntegerType()))
                       )
-
     # Overwrite the staging table with transformed data
     (transformed_df
             .write
@@ -47,4 +43,3 @@ if is_played_data_valid(transformed_df):
             .mode("overwrite")
             .saveAsTable(f"spotify.{STAGING_TABLE}")
     )
-

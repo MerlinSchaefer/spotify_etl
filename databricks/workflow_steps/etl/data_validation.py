@@ -2,7 +2,7 @@ import pandas as pd
 from typing import List, Optional
 
 
-def validate_played_data(
+def is_played_data_valid(
     df: pd.DataFrame, not_null_cols: Optional[List[str]] = None
 ) -> bool:
     """
@@ -44,7 +44,7 @@ def validate_played_data(
     return True
 
 
-def validate_audio_data(df: pd.DataFrame) -> bool:
+def is_audio_data_valid(df: pd.DataFrame) -> bool:
     """
     Validate the dataframe of audio features.
 

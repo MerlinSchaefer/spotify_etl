@@ -1,4 +1,5 @@
 import re
+import json
 import pandas as pd
 from typing import Dict
 from etl.pydantic_models import (
@@ -9,21 +10,24 @@ from etl.pydantic_models import (
 
 
 @validate_data_schema(data_schema=TracksDataSchema)
-def clean_recently_played(recently_played: Dict[str, str]) -> pd.DataFrame:
+def clean_recently_played(recently_played: str| Dict[str, str]) -> pd.DataFrame:
     """
     Load the recently played json dict into a pd.DataFrame
     and clean it to only contain necessary columns.
 
     Parameters
     ----------
-    recently_played : dict
-        The recently played tracks as the json dict from the API request.
+    recently_played : str | dict
+        The recently played tracks as the json (str or dict) from the API request.
 
     Returns
     -------
     df : pd.DataFrame
         The cleaned pd.DataFrame of recently played tracks.
     """
+    if isinstance(recently_played, str):
+        # Extract the raw JSON str data
+        recently_played = json.loads(recently_played)
     df = pd.DataFrame(recently_played["items"])
     df = pd.concat(
         [
@@ -57,7 +61,7 @@ def clean_recently_played(recently_played: Dict[str, str]) -> pd.DataFrame:
 
 
 @validate_data_schema(data_schema=AudioFeaturesDataSchema)
-def clean_audio_features(audio_features: Dict[str, str]) -> pd.DataFrame:
+def clean_audio_features(audio_features: str | Dict[str, str]) -> pd.DataFrame:
     """
     Load the audio features json dict into a pd.DataFrame
     and clean the audio features dataframe.
@@ -72,6 +76,8 @@ def clean_audio_features(audio_features: Dict[str, str]) -> pd.DataFrame:
     df : pd.DataFrame
         The dataframe with audio features cleaned.
     """
+    if isinstance(audio_features, str):
+        audio_features = json.loads(audio_features)
     df = pd.DataFrame(audio_features)
     # drop duplicates as one track can be played multiple times
     df = df.drop_duplicates(subset="id")
