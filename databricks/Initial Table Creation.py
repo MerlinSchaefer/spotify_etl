@@ -44,9 +44,13 @@ track_history_df.display()
 
 # COMMAND ----------
 
-audio_features_metadata_df.drop("_c0").drop("id").write.format("delta").mode("append").saveAsTable("spotify.audio_features_metadata")
+audio_features_metadata_df.drop("_c0").drop("id").write.format("delta").mode("overwrite").saveAsTable("spotify.audio_features_metadata")
 
 # COMMAND ----------
 
-track_history_df.drop("_c0").write.format("delta").mode("append").saveAsTable("spotify.track_history")
-audio_features_df.drop("_c0").write.format("delta").mode("append").saveAsTable("spotify.audio_features")
+# track_history_df.drop("_c0").write.format("delta").mode("append").saveAsTable("spotify.track_history")
+# audio_features_df.drop("_c0").write.format("delta").mode("append").saveAsTable("spotify.audio_features")
+
+# COMMAND ----------
+
+# track_history_df.drop("_c0").write.format("delta").mode("append").saveAsTable("spotify.raw_track_history")
