@@ -38,6 +38,7 @@ def authenticate(
     client_secret: str,
     scope: str,
     redirect_uri: str = "http://localhost:8888",
+    cache_path =  "/dbfs/tmp/spotify/.cache"
 ) -> spotipy.Spotify:
     """
     Authenticate with Spotify via client id and client secret in Databricks.
@@ -54,21 +55,20 @@ def authenticate(
         The redirect uri set for the Spotify application in the dashboard.
         The default is "http://localhost:8888".
     """
-    # Define a persistent path on DBFS for storing the cache
-    cache_path = "/dbfs/tmp/spotify/.cache"
 
     # Ensure the DBFS path exists
-    os.makedirs("/dbfs/tmp/spotify", exist_ok=True)
+    os.makedirs("/dbfs/tmp/spotify/", exist_ok=True)
+    # assert that .cache exists
+    assert os.path.exists(cache_path)
 
     auth_manager = SpotifyOAuth(
         client_id=client_id,
         client_secret=client_secret,
         redirect_uri=redirect_uri,
         scope=scope,
-        cache_path="/dbfs/tmp/spotify/.cache",
-        open_browser=False
+        cache_path=cache_path,
     )
     
    
-    return spotipy.Spotify(auth_manager=auth_manager)
+    return spotipy.Spotify(auth_manager=auth_manager, retries = 20)
 

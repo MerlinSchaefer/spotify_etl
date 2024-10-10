@@ -1,4 +1,5 @@
 # Databricks notebook source
+from datetime import datetime, timedelta
 from utils.authentication import authenticate, get_spotify_auth_vars
 
 
@@ -6,8 +7,9 @@ from utils.authentication import authenticate, get_spotify_auth_vars
 
 CLIENT_ID, CLIENT_SECRET, SCOPE, USERNAME = get_spotify_auth_vars( return_username=True)
 # Add playlist creation to standard scope and authenticate
-SCOPE = SCOPE + " playlist-modify-private playlist-read-private"
+SCOPE = "user-read-recently-played user-read-currently-playing user-read-playback-state user-read-private playlist-modify-private playlist-read-private playlist-modify-public"
 spotify = authenticate(CLIENT_ID, CLIENT_SECRET, SCOPE)
+
 
 # COMMAND ----------
 
@@ -32,20 +34,23 @@ reccuring_tracks_df = last_month_tracks_df[
 ]
 # get all unique ids for playlist generation
 playlist_track_ids = reccuring_tracks_df.iloc[:, 1].unique().tolist()
+
+
+# COMMAND ----------
+
 # create playlist
 create_playlist_response = spotify.user_playlist_create(
     user=USERNAME,
-    name=f"Flashback {current_year}-{last_month}",
+    name=f"Flashback {current_year}-{str(last_month).zfill(2)}",
     public=False,
-    collaborative=False,
-    description="""Monthly flashback playlist based on tracks 
-    from track history db that have been listened to at least 3 times.""",
 )
 # retrieve playlist id
 playlist_uri = create_playlist_response.get("id")
+
+# COMMAND ----------
+
 # add songs to playlist
 spotify.user_playlist_add_tracks(
     user=USERNAME, playlist_id=playlist_uri, tracks=playlist_track_ids
 )
 print("Playlist created successfully.")
-
