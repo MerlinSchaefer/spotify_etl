@@ -1,0 +1,114 @@
+resources:
+  jobs:
+    Spotify_Get_Latest_Tracks:
+      name: Spotify-Get-Latest-Tracks
+      email_notifications:
+        on_failure:
+          - ms101196@googlemail.com
+        no_alert_for_skipped_runs: true
+      notification_settings:
+        no_alert_for_skipped_runs: true
+        no_alert_for_canceled_runs: true
+      trigger:
+        pause_status: UNPAUSED
+        periodic:
+          interval: 2
+          unit: HOURS
+      tasks:
+        - task_key: Load_Recent_Tracks
+          notebook_task:
+            notebook_path: /Workspace/Users/merlin.schaefer@analytical-software.de/spotify_etl/databricks/workflow_steps/Extract
+              Recently Played Tracks
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          libraries:
+            - requirements: /Workspace/Users/merlin.schaefer@analytical-software.de/spotify_etl/databricks/requirements.txt
+            - pypi:
+                package: async-timeout==4.0.2
+          max_retries: 1
+          min_retry_interval_millis: 300000
+          timeout_seconds: 1200
+          health:
+            rules:
+              - metric: RUN_DURATION_SECONDS
+                op: GREATER_THAN
+                value: 600
+        - task_key: Transform_and_Validate_Tracks
+          depends_on:
+            - task_key: Load_Recent_Tracks
+          notebook_task:
+            notebook_path: /Workspace/Users/merlin.schaefer@analytical-software.de/spotify_etl/databricks/workflow_steps/Transform
+              and Validate Tracks
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          libraries:
+            - requirements: /Workspace/Users/merlin.schaefer@analytical-software.de/spotify_etl/databricks/requirements.txt
+            - pypi:
+                package: async-timeout==4.0.2
+          max_retries: 1
+          min_retry_interval_millis: 300000
+          timeout_seconds: 1200
+        - task_key: Extract_Audio_Features
+          depends_on:
+            - task_key: Transform_and_Validate_Tracks
+          notebook_task:
+            notebook_path: /Workspace/Users/merlin.schaefer@analytical-software.de/spotify_etl/databricks/workflow_steps/Extract
+              Audio Features
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          libraries:
+            - pypi:
+                package: async-timeout==4.0.2
+            - requirements: /Workspace/Users/merlin.schaefer@analytical-software.de/spotify_etl/databricks/requirements.txt
+          max_retries: 1
+          min_retry_interval_millis: 300000
+          timeout_seconds: 1200
+        - task_key: Transform_and_Validate_Audio_Features
+          depends_on:
+            - task_key: Extract_Audio_Features
+          notebook_task:
+            notebook_path: /Workspace/Users/merlin.schaefer@analytical-software.de/spotify_etl/databricks/workflow_steps/Transforman
+              and Validate Audio Data
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          libraries:
+            - requirements: /Workspace/Users/merlin.schaefer@analytical-software.de/spotify_etl/databricks/requirements.txt
+            - pypi:
+                package: async-timeout==4.0.2
+          max_retries: 1
+          min_retry_interval_millis: 300000
+          timeout_seconds: 1200
+        - task_key: Load_Tracks_and_Audio_Features
+          depends_on:
+            - task_key: Transform_and_Validate_Audio_Features
+          notebook_task:
+            notebook_path: /Workspace/Users/merlin.schaefer@analytical-software.de/spotify_etl/databricks/workflow_steps/Load_Tracks_and_Audio_Features
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          max_retries: 1
+          min_retry_interval_millis: 300000
+          timeout_seconds: 1200
+      job_clusters:
+        - job_cluster_key: Job_cluster
+          new_cluster:
+            cluster_name: ""
+            spark_version: 15.4.x-scala2.12
+            spark_conf:
+              spark.master: local[*, 4]
+              spark.databricks.cluster.profile: singleNode
+            azure_attributes:
+              first_on_demand: 1
+              availability: ON_DEMAND_AZURE
+              spot_bid_max_price: -1
+            node_type_id: Standard_DS3_v2
+            driver_node_type_id: Standard_DS3_v2
+            custom_tags:
+              ResourceClass: SingleNode
+            spark_env_vars:
+              PYSPARK_PYTHON: /databricks/python3/bin/python3
+            enable_elastic_disk: true
+            data_security_mode: LEGACY_SINGLE_USER_STANDARD
+            runtime_engine: STANDARD
+            num_workers: 0
+      queue:
+        enabled: true

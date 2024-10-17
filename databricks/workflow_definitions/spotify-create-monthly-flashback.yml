@@ -1,0 +1,52 @@
+resources:
+  jobs:
+    Spotify_Create_Monthly_Flashback_Playlist:
+      name: Spotify-Create-Monthly-Flashback-Playlist
+      schedule:
+        quartz_cron_expression: 53 0 2 1 * ?
+        timezone_id: UTC
+        pause_status: UNPAUSED
+      tasks:
+        - task_key: Create_Monthly_Playlist
+          notebook_task:
+            notebook_path: /Workspace/Users/merlin.schaefer@analytical-software.de/spotify_etl/databricks/workflow_steps/Create
+              Monthly Playlist
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+          libraries:
+            - pypi:
+                package: async-timeout==4.0.2
+            - requirements: /Workspace/Users/merlin.schaefer@analytical-software.de/spotify_etl/databricks/requirements.txt
+          max_retries: 2
+          min_retry_interval_millis: 900000
+          retry_on_timeout: true
+          timeout_seconds: 2700
+          health:
+            rules:
+              - metric: RUN_DURATION_SECONDS
+                op: GREATER_THAN
+                value: 1800
+      job_clusters:
+        - job_cluster_key: Job_cluster
+          new_cluster:
+            cluster_name: ""
+            spark_version: 15.4.x-scala2.12
+            spark_conf:
+              spark.master: local[*, 4]
+              spark.databricks.cluster.profile: singleNode
+            azure_attributes:
+              first_on_demand: 1
+              availability: ON_DEMAND_AZURE
+              spot_bid_max_price: -1
+            node_type_id: Standard_DS3_v2
+            driver_node_type_id: Standard_DS3_v2
+            custom_tags:
+              ResourceClass: SingleNode
+            spark_env_vars:
+              PYSPARK_PYTHON: /databricks/python3/bin/python3
+            enable_elastic_disk: true
+            data_security_mode: LEGACY_SINGLE_USER_STANDARD
+            runtime_engine: STANDARD
+            num_workers: 0
+      queue:
+        enabled: true

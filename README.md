@@ -10,11 +10,18 @@ Maybe this can even be enriched with a sensible recommendation.
 
 Additionally I want to use this project to learn and practice some best practices such as CI/CD, type hinting and checking, testing, and data validation through pydantic.
 
-Tech Stack (question mark means potential but still undecided):
+## Original Tech Stack (question mark means potential but still undecided):
 
 - Python (pandas, spotipy, mypy, pydantic, psycopg2, boto3, black)
 - PostgreSQL on RDS
 - AWS EC2 + cronjob (Airflow could technically be used, dag is functional, complications of setup on EC2 didn't warrant the effort. A simple cronjob works for the hourly data ingest.) 
+
+## V2.0 Databricks
+
+- after my free AWS tier ran out the project was stopped
+- decided to relaunch on Azure
+- created a setup on Databricks as this will be quickest and easiest for me (everything necessary is in `./databricks`)
+- once I have it running may add a platform independent version again
 
 
 ## Spotify Authentication
@@ -22,4 +29,4 @@ Tech Stack (question mark means potential but still undecided):
 Authentication is handled by spotipy and oauth2.
 To use `spotipy.oauth2` the `SPOTIPY_CLIENT_ID` and `SPOTIPY_CLIENT_SECRET` environment variables need to be set. 
 In order to obtain a set of credentials you need to register with the [Spotify Developer Service](https://developer.spotify.com/).
-
+Additionally if you want to run this on Databricks you need to authenticate the user once in an interactive setting, then transfer the `.cache` file with the token to a path on dbfs
