@@ -17,7 +17,7 @@ def get_spotify_auth_vars(return_username: bool = False) -> list[str]:
         A list of the variables needed for spotify auth.
     """
      # Spotify API authentication scope
-    spotify_scope = "user-read-recently-played user-read-currently-playing user-read-playback-state user-read-private"
+    spotify_scope = "user-read-recently-played user-read-currently-playing user-read-playback-state user-read-private playlist-modify-private playlist-read-private"
     
     try:
         client_id = dbutils.secrets.get(scope="spotify", key="SPOTIPY_CLIENT_ID")
