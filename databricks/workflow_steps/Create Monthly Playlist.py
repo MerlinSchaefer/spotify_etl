@@ -28,7 +28,7 @@ last_month_track_history_query = f"""
     """
 last_month_tracks_df = spark.sql(last_month_track_history_query).toPandas()
 track_names = last_month_tracks_df["name"].value_counts()
-recurring_tracks = track_names[(last_month_tracks_df["name"].value_counts() >= 4)]
+recurring_tracks = track_names[(last_month_tracks_df["name"].value_counts() >= 3)]
 reccuring_tracks_df = last_month_tracks_df[
     last_month_tracks_df["name"].isin(recurring_tracks.index)
 ]
