@@ -49,13 +49,14 @@ if __name__ == "__main__":
         # Insert only new records into spotify.track_history
         played_tracks_df['played_at'] = pd.to_datetime(played_tracks_df['played_at'])
         played_tracks_df =  played_tracks_df[["played_at", "id", "name", "artists", "album", "duration_ms", "explicit", "href", "is_local", "popularity", "uri"]]
-        connection.execute("""
+	print(connection.sql("SELECT COUNT(*) FROM spotify.track_history").df())        
+	connection.execute("""
             INSERT INTO spotify.track_history
             SELECT * FROM played_tracks_df
             WHERE played_at NOT IN (SELECT played_at FROM spotify.track_history);
         """)
         print(played_tracks_df.head())
-        print(connection.sql("SELECT * FROM spotify.track_history ORDER BY played_at DESC LIMIT 100").df())
+        print(connection.sql("SELECT COUNT(*) FROM spotify.track_history").df())
         connection.close()
         print("Data inserted successfully.")
 
