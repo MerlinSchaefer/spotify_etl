@@ -6,7 +6,7 @@ import os
 CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("SPOTIPY_CLIENT_SECRET")
 
-scope = "user-read-recently-played user-read-currently-playing user-read-playback-state user-read-private"
+scope = "user-read-recently-played user-read-currently-playing user-read-playback-state user-read-private playlist-modify-private playlist-read-private"
 
 
 def authenticate(
@@ -28,7 +28,7 @@ def authenticate(
         The scope of the authentication (e.g. "user-read-currently-played").
     redirect_uri : str, optional
         The redirect uri provided set for the spotify application in the dashboard.
-        The default is "http://localhost:8000".
+        The default is "http://localhost:8000.
     """
     return spotipy.Spotify(
         auth_manager=SpotifyOAuth(
