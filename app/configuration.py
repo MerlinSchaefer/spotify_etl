@@ -1,6 +1,7 @@
 import configparser
 from typing import List
-
+import dotenv
+import os
 
 def set_spotify_variables(return_username: bool = False) -> List[str]:
     """
@@ -12,20 +13,17 @@ def set_spotify_variables(return_username: bool = False) -> List[str]:
         A list of the variables.
     """
     try:
-        config = configparser.ConfigParser()
-        config.read("app/config.ini")
-
-        spotify_config = config["spotify"]
+        dotenv.load_dotenv(dotenv.find_dotenv())
 
     except Exception as e:
         print(f"Error retrieving spotify configuration: {e}")
 
     # Spotify API authentication settings
-    CLIENT_ID = spotify_config.get("client_id")
-    CLIENT_SECRET = spotify_config.get("client_secret")
+    CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
+    CLIENT_SECRET = os.getenv("SPOTIPY_CLIENT_SECRET")
     SCOPE = "user-read-recently-played user-read-currently-playing user-read-playback-state user-read-private"
     if return_username:
-        USERNAME = spotify_config.get("username")
+        USERNAME = os.getenv("USERNAME")
         return [CLIENT_ID, CLIENT_SECRET, SCOPE, USERNAME]
     return [CLIENT_ID, CLIENT_SECRET, SCOPE]
 

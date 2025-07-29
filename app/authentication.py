@@ -13,7 +13,8 @@ def authenticate(
     client_id: str,
     client_secret: str,
     scope: str,
-    redirect_uri: str = "http://localhost:8000",
+    redirect_uri: str = "http://localhost/",
+    cache_path: str = ".cache"
 ) -> spotipy.Spotify:
     """
     Authenticate with Spotify via client id and client secret.
@@ -28,7 +29,7 @@ def authenticate(
         The scope of the authentication (e.g. "user-read-currently-played").
     redirect_uri : str, optional
         The redirect uri provided set for the spotify application in the dashboard.
-        The default is "http://localhost:8000.
+        The default is "http://localhost/".
     """
     return spotipy.Spotify(
         auth_manager=SpotifyOAuth(
@@ -36,6 +37,6 @@ def authenticate(
             client_id=client_id,
             client_secret=client_secret,
             redirect_uri=redirect_uri,
-            cache_path=".cache",
+            cache_path=cache_path,
         )
     )

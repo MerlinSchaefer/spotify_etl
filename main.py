@@ -1,4 +1,6 @@
 import duckdb
+import os
+import dotenv
 from app.configuration import set_spotify_variables
 from app.authentication import authenticate
 from app.datacleaning import clean_recently_played 
@@ -9,11 +11,14 @@ import pandas as pd
 
 if __name__ == "__main__":
     CLIENT_ID, CLIENT_SECRET, SCOPE = set_spotify_variables()
-
+    dotenv.load_dotenv(dotenv_path=dotenv.find_dotenv())
     print("Variables set")
-
+    cache_path = os.getenv("CACHE_PATH")
+    print(cache_path)
+    db_path = os.getenv("DB_PATH")
+    print(db_path)
     # Authenticate with Spotify API
-    spotify = authenticate(CLIENT_ID, CLIENT_SECRET, SCOPE)
+    spotify = authenticate(CLIENT_ID, CLIENT_SECRET, SCOPE, cache_path=cache_path)
     # retrieve recently played tracks
     played_tracks = spotify.current_user_recently_played(limit=50)
     # clean the recently played tracks and create dataframe
@@ -26,7 +31,7 @@ if __name__ == "__main__":
     print(played_tracks_df.head())
     if validate_played_data(played_tracks_df):
 
-        connection = duckdb.connect(database="spotifydb.duckdb", read_only=False)
+        connection = duckdb.connect(database=db_path, read_only=False)
         connection.execute("""
             CREATE SCHEMA IF NOT EXISTS spotify;
         """)
@@ -49,8 +54,8 @@ if __name__ == "__main__":
         # Insert only new records into spotify.track_history
         played_tracks_df['played_at'] = pd.to_datetime(played_tracks_df['played_at'])
         played_tracks_df =  played_tracks_df[["played_at", "id", "name", "artists", "album", "duration_ms", "explicit", "href", "is_local", "popularity", "uri"]]
-	print(connection.sql("SELECT COUNT(*) FROM spotify.track_history").df())        
-	connection.execute("""
+        print(connection.sql("SELECT COUNT(*) FROM spotify.track_history").df())        
+        connection.execute("""
             INSERT INTO spotify.track_history
             SELECT * FROM played_tracks_df
             WHERE played_at NOT IN (SELECT played_at FROM spotify.track_history);
