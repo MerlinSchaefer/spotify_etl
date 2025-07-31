@@ -1,5 +1,6 @@
 import duckdb
 import os
+import time
 import dotenv
 from app.configuration import set_spotify_variables
 from app.authentication import authenticate
@@ -8,17 +9,33 @@ from app.datavalidation import validate_played_data
 #from app.upsert import upsert_df # redo for duckdb
 from pydantic import ValidationError
 import pandas as pd
+from app.grafana_logger import JsonGrafanaLogger, EventType
+import logging
+
+# Initialize the loggers
+# standard logger for general logging
+logger = logging.getLogger("spotify_etl")
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Grafana logger for structured logging of main script events
+grafana_logger = JsonGrafanaLogger('grafana', 'logs/grafana_events.json')
 
 if __name__ == "__main__":
+    start_time = time.time()  # Start time for the script
     CLIENT_ID, CLIENT_SECRET, SCOPE = set_spotify_variables()
     dotenv.load_dotenv(dotenv_path=dotenv.find_dotenv())
-    print("Variables set")
+    logger.info("Variables set")
     cache_path = os.getenv("CACHE_PATH")
-    print(cache_path)
+    logger.debug(f"Cache path: {cache_path}")
     db_path = os.getenv("DB_PATH")
-    print(db_path)
+    logger.debug(f"Database path: {db_path}")
     # Authenticate with Spotify API
-    spotify = authenticate(CLIENT_ID, CLIENT_SECRET, SCOPE, cache_path=cache_path)
+    try:
+        spotify = authenticate(CLIENT_ID, CLIENT_SECRET, SCOPE, cache_path=cache_path)
+    except Exception as e:
+        logger.error(f"Error authenticating with Spotify API: {e}")
+        grafana_logger.log_event(EventType.ERROR, "Auth failure", 0, "Error authenticating with Spotify API", {"error": str(e)})
+        raise e
+    logger.debug("Authenticated with Spotify API")
     # retrieve recently played tracks
     played_tracks = spotify.current_user_recently_played(limit=50)
     # clean the recently played tracks and create dataframe
@@ -26,9 +43,10 @@ if __name__ == "__main__":
     try:
         played_tracks_df = clean_recently_played(played_tracks)
     except ValidationError as e:
-        print(e)
+        logger.error(f"Validation error in recently played tracks: {e}")
+        grafana_logger.log_event(EventType.ERROR, "Data validation failure", 0, "Validation error in recently played tracks", {"error": str(e)})
+        raise e
     # validate the recently played tracks dataframe for sql requirements
-    print(played_tracks_df.head())
     if validate_played_data(played_tracks_df):
 
         connection = duckdb.connect(database=db_path, read_only=False)
@@ -50,20 +68,29 @@ if __name__ == "__main__":
             uri STRING
             );
         """)
-        print("Database connection established.")
+        logger.info("Database connection established.")
         # Insert only new records into spotify.track_history
         played_tracks_df['played_at'] = pd.to_datetime(played_tracks_df['played_at'])
         played_tracks_df =  played_tracks_df[["played_at", "id", "name", "artists", "album", "duration_ms", "explicit", "href", "is_local", "popularity", "uri"]]
-        print(connection.sql("SELECT COUNT(*) FROM spotify.track_history").df())        
+        current_num_tracks = connection.sql("SELECT COUNT(*) FROM spotify.track_history").df().iloc[0, 0]
+        logger.info(f"Current number of tracks in database: {current_num_tracks}")
         connection.execute("""
             INSERT INTO spotify.track_history
             SELECT * FROM played_tracks_df
             WHERE played_at NOT IN (SELECT played_at FROM spotify.track_history);
         """)
-        print(played_tracks_df.head())
+        logger.info(f"Inserted {played_tracks_df.shape[0]} new tracks into database.")
         print(connection.sql("SELECT COUNT(*) FROM spotify.track_history").df())
         connection.close()
-        print("Data inserted successfully.")
+        end_time = time.time()
+        duration = end_time - start_time
+        logger.info(f"Data inserted successfully. Script completed in {duration:.2f} seconds.")
+        grafana_logger.log_event(EventType.TRACKS_ADDED, "success", duration,
+                                "Successfully added new tracks to the database",
+                                {"new_tracks_count": played_tracks_df.shape[0], "total_tracks": current_num_tracks + played_tracks_df.shape[0]})
 
     else:
-        print("Recently played tracks dataframe is not valid.")
+        logger.error("Recently played tracks dataframe is not valid.")
+        grafana_logger.log_event(EventType.ERROR, "Data validation failure", 0,
+                                "Recently played tracks dataframe is not valid")
+        raise ValueError("Recently played tracks dataframe is not valid.")
