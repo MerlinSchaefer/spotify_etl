@@ -82,9 +82,11 @@ if __name__ == "__main__":
 
     logger.info(f"Playlist created with ID: {playlist_uri}")
     grafana_logger.log_event(
-        EventType.PLAYLIST_CREATED, "success", time.time() - start_time,
-        "Successfully created playlist",
-        {"playlist_id": playlist_uri, "month": target_month, "year": target_year}
+        EventType.PLAYLIST_CREATED, status="success", duration_s= time.time() - start_time,
+        message="Successfully created playlist",
+        metadata={"playlist_id": playlist_uri, 
+                  "month": int(target_month), # for json serialization
+                  "year": int(target_year)} # for json serialization
     )
     # retrieve playlist id
 

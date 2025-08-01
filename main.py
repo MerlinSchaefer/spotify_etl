@@ -1,7 +1,7 @@
-import duckdb
 import os
 import time
 import dotenv
+import duckdb
 from app.configuration import set_spotify_variables
 from app.authentication import authenticate
 from app.datacleaning import clean_recently_played 
@@ -85,9 +85,12 @@ if __name__ == "__main__":
         end_time = time.time()
         duration = end_time - start_time
         logger.info(f"Data inserted successfully. Script completed in {duration:.2f} seconds.")
-        grafana_logger.log_event(EventType.TRACKS_ADDED, "success", duration,
-                                "Successfully added new tracks to the database",
-                                {"new_tracks_count": played_tracks_df.shape[0], "total_tracks": current_num_tracks + played_tracks_df.shape[0]})
+        grafana_logger.log_event(event_type= EventType.TRACKS_ADDED, 
+                                 status="success",
+                                 duration_s=duration,
+                                message="Successfully added new tracks to the database",
+                                metadata={"new_tracks_count": int(played_tracks_df.shape[0]), # for json serialization
+                                  "total_tracks": int(current_num_tracks + played_tracks_df.shape[0])})
 
     else:
         logger.error("Recently played tracks dataframe is not valid.")
