@@ -14,7 +14,7 @@ def authenticate(
     client_secret: str,
     scope: str,
     redirect_uri: str = "http://localhost/",
-    cache_path: str = ".cache"
+    cache_path: str = ".cache",
 ) -> spotipy.Spotify:
     """
     Authenticate with Spotify via client id and client secret.

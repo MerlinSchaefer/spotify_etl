@@ -13,18 +13,32 @@ from app.grafana_logger import JsonGrafanaLogger, EventType
 
 if __name__ == "__main__":
     logger = logging.getLogger("monthly_playlist")
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-    grafana_logger = JsonGrafanaLogger('grafana', 'logs/grafana_events.json')
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+    grafana_logger = JsonGrafanaLogger("grafana", "logs/grafana_events.json")
 
     parser = argparse.ArgumentParser(description="Generate monthly Spotify playlist.")
-    parser.add_argument("--month", type=int, help="Month number (1-12) to generate playlist for. Defaults to last month.", default=None)
-    parser.add_argument("--year", type=int, help="Year to generate playlist for. Defaults to current year if not specified.", default=None)
+    parser.add_argument(
+        "--month",
+        type=int,
+        help="Month number (1-12) to generate playlist for. Defaults to last month.",
+        default=None,
+    )
+    parser.add_argument(
+        "--year",
+        type=int,
+        help="Year to generate playlist for. Defaults to current year if not specified.",
+        default=None,
+    )
     args = parser.parse_args()
 
-    start_time = time.time()  
+    start_time = time.time()
 
     dotenv.load_dotenv(dotenv_path=dotenv.find_dotenv())
-    CLIENT_ID, CLIENT_SECRET, SCOPE, USERNAME = set_spotify_variables(return_username=True)
+    CLIENT_ID, CLIENT_SECRET, SCOPE, USERNAME = set_spotify_variables(
+        return_username=True
+    )
     cache_path = os.getenv("CACHE_PATH")
     db_path = os.getenv("DB_PATH")
     logger.info("Variables set")
@@ -46,7 +60,13 @@ if __name__ == "__main__":
         logger.info("Authenticated with Spotify API")
     except Exception as e:
         logger.error(f"Error authenticating with Spotify API: {e}")
-        grafana_logger.log_event(EventType.ERROR, "Auth failure", 0, "Error authenticating with Spotify API", {"error": str(e)})
+        grafana_logger.log_event(
+            EventType.ERROR,
+            "Auth failure",
+            0,
+            "Error authenticating with Spotify API",
+            {"error": str(e)},
+        )
         raise e
 
     # query track database
@@ -76,31 +96,43 @@ if __name__ == "__main__":
     )
     if not create_playlist_response:
         logger.error("Failed to create playlist.")
-        grafana_logger.log_event(EventType.ERROR, "Playlist creation failure", 0, "Failed to create playlist")
+        grafana_logger.log_event(
+            EventType.ERROR, "Playlist creation failure", 0, "Failed to create playlist"
+        )
         raise Exception("Failed to create playlist")
     playlist_uri = create_playlist_response.get("id")
 
     logger.info(f"Playlist created with ID: {playlist_uri}")
     grafana_logger.log_event(
-        EventType.PLAYLIST_CREATED, status="success", duration_s= time.time() - start_time,
+        EventType.PLAYLIST_CREATED,
+        status="success",
+        duration_s=time.time() - start_time,
         message="Successfully created playlist",
-        metadata={"playlist_id": playlist_uri, 
-                  "month": int(target_month), # for json serialization
-                  "year": int(target_year)} # for json serialization
+        metadata={
+            "playlist_id": playlist_uri,
+            "month": int(target_month),  # for json serialization
+            "year": int(target_year),
+        },  # for json serialization
     )
     # retrieve playlist id
 
     # add songs to playlist in batches of 100
     max_batch_size = 100
     for i in range(0, len(playlist_track_ids), max_batch_size):
-        batch = playlist_track_ids[i:i + max_batch_size]
+        batch = playlist_track_ids[i : i + max_batch_size]
         spotify.user_playlist_add_tracks(
             user=USERNAME, playlist_id=playlist_uri, tracks=batch
         )
         logger.info(f"Added tracks {i+1} to {i+len(batch)} to playlist.")
     grafana_logger.log_event(
-        EventType.PLAYLIST_UPDATED, "success", time.time() - start_time,
+        EventType.PLAYLIST_UPDATED,
+        "success",
+        time.time() - start_time,
         "Successfully updated playlist with new tracks",
-        {"playlist_id": playlist_uri, "num_added_tracks": len(playlist_track_ids), "added_tracks": playlist_track_ids}
+        {
+            "playlist_id": playlist_uri,
+            "num_added_tracks": len(playlist_track_ids),
+            "added_tracks": playlist_track_ids,
+        },
     )
     logger.info("Playlist created successfully.")

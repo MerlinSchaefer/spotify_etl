@@ -3,6 +3,7 @@ from typing import List
 import dotenv
 import os
 
+
 def set_spotify_variables(return_username: bool = False) -> List[str]:
     """
     Set the variables for the spotify authentication.

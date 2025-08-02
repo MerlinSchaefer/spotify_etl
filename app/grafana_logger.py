@@ -32,7 +32,14 @@ class JsonGrafanaLogger(logging.Logger):
         # No FileHandler needed — we manage JSON file directly
         self.setLevel(logging.INFO)
 
-    def log_event(self, event_type: EventType, status: str, duration_s: float, message: str = "", metadata: dict = None):
+    def log_event(
+        self,
+        event_type: EventType,
+        status: str,
+        duration_s: float,
+        message: str = "",
+        metadata: dict = None,
+    ):
         """
         Log an event to the JSON file.
         Args:
@@ -54,7 +61,7 @@ class JsonGrafanaLogger(logging.Logger):
             "status": status,
             "duration_s": duration_s,
             "message": message,
-            "metadata": metadata
+            "metadata": metadata,
         }
 
         if self.log_file.exists():
