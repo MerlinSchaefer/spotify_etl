@@ -6,18 +6,21 @@ from app.configuration import set_spotify_variables
 from app.authentication import authenticate
 from app.datacleaning import clean_recently_played 
 from app.datavalidation import validate_played_data
-#from app.upsert import upsert_df # redo for duckdb
 from pydantic import ValidationError
 import pandas as pd
+from pathlib import Path
 from app.grafana_logger import JsonGrafanaLogger, EventType
 import logging
+
+BASE_DIR = Path(__file__).resolve().parent
+LOG_PATH = BASE_DIR / "logs" / "grafana_events.json"
 
 # Initialize the loggers
 # standard logger for general logging
 logger = logging.getLogger("spotify_etl")
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 # Grafana logger for structured logging of main script events
-grafana_logger = JsonGrafanaLogger('grafana', 'logs/grafana_events.json')
+grafana_logger = JsonGrafanaLogger("grafana", LOG_PATH)
 
 if __name__ == "__main__":
     start_time = time.time()  # Start time for the script
